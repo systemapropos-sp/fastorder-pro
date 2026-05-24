@@ -1,17 +1,13 @@
 import { useState } from "react";
-import { trpc } from "@/providers/trpc";
+import { useOrders } from "@/hooks/useStaticQueries";
 import { Search, CreditCard, CheckCircle } from "lucide-react";
-
-const TENANT_ID = 1;
 
 export default function PosOrders() {
   const [search, setSearch] = useState("");
-  const { data: orders, isLoading } = trpc.order.list.useQuery({ tenantId: TENANT_ID });
+  const { data: orders, isLoading } = useOrders();
 
-  const utils = trpc.useUtils();
-  const updatePayment = trpc.order.updatePayment.useMutation({
-    onSuccess: () => utils.order.list.invalidate(),
-  });
+  // Mock mutation
+  const updatePayment = { mutate: (_vars: any) => {} };
 
   const filtered = orders?.filter((o) =>
     search === "" ||

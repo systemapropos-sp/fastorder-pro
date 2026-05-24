@@ -1,18 +1,12 @@
 import { useState } from "react";
-import { trpc } from "@/providers/trpc";
+import { useInventory } from "@/hooks/useStaticQueries";
 import { AlertTriangle, Search } from "lucide-react";
-
-const TENANT_ID = 1;
 
 export default function InventoryPage() {
   const [search, setSearch] = useState("");
   const [showLowStock, setShowLowStock] = useState(false);
 
-  const { data: items, isLoading } = trpc.inventory.list.useQuery({
-    tenantId: TENANT_ID,
-    search: search || undefined,
-    lowStock: showLowStock || undefined,
-  });
+  const { data: items, isLoading } = useInventory(search || undefined, showLowStock || undefined);
 
   return (
     <div className="p-6">

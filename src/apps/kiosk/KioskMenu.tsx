@@ -1,16 +1,14 @@
 import { useState } from "react";
 
-import { trpc } from "@/providers/trpc";
+import { useMenuCategories, useMenuItems } from "@/hooks/useStaticQueries";
 import { useCartStore } from "@/store/cartStore";
 import { Plus, Star, Minus } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
-const TENANT_ID = 1;
-
 export default function KioskMenu() {
   const addToCart = useCartStore((s) => s.addItem);
-  const { data: categories } = trpc.menu.categories.useQuery({ tenantId: TENANT_ID });
-  const { data: menuItems } = trpc.menu.items.useQuery({ tenantId: TENANT_ID });
+  const { data: categories } = useMenuCategories();
+  const { data: menuItems } = useMenuItems();
 
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
   const [selectedItem, setSelectedItem] = useState<any>(null);

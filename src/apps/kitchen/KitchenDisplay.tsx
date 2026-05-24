@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { trpc } from "@/providers/trpc";
+import { useKitchenTickets, useKitchenStats } from "@/hooks/useStaticQueries";
 import { Clock, ChefHat, CheckCircle, AlertCircle, ArrowLeft, Flame, Package } from "lucide-react";
 import { useNavigate } from "react-router";
-
-const TENANT_ID = 1;
 
 const statusConfig: Record<string, { label: string; color: string; border: string; bg: string; icon: any }> = {
   pending: { label: "New", color: "text-red-600", border: "border-red-400", bg: "bg-red-50", icon: AlertCircle },
@@ -23,23 +21,12 @@ export default function KitchenDisplay() {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<string>("all");
 
-  const { data: tickets, isLoading } = trpc.kitchen.tickets.useQuery(
-    { tenantId: TENANT_ID },
-    { refetchInterval: 3000 }
-  );
+  const { data: tickets, isLoading } = useKitchenTickets();
+  const { data: stats } = useKitchenStats();
 
-  const { data: stats } = trpc.kitchen.stats.useQuery(
-    { tenantId: TENANT_ID },
-    { refetchInterval: 3000 }
-  );
-
-  const utils = trpc.useUtils();
-  const updateItem = trpc.kitchen.updateItemStatus.useMutation({
-    onSuccess: () => utils.kitchen.tickets.invalidate(),
-  });
-  const updateOrder = trpc.kitchen.updateOrderStatus.useMutation({
-    onSuccess: () => utils.kitchen.tickets.invalidate(),
-  });
+  // Mock mutations
+  const updateItem = { mutate: (_vars: any) => {} };
+  const updateOrder = { mutate: (_vars: any) => {} };
 
   const filtered = filter === "all" ? tickets : tickets?.filter((t) => t.status === filter);
 

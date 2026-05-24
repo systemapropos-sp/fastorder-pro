@@ -1,7 +1,5 @@
-import { trpc } from "@/providers/trpc";
+import { useTables } from "@/hooks/useStaticQueries";
 import { Armchair } from "lucide-react";
-
-const TENANT_ID = 1;
 
 const statusColors: Record<string, string> = {
   available: "bg-green-100 text-green-700 border-green-300",
@@ -11,13 +9,9 @@ const statusColors: Record<string, string> = {
 };
 
 export default function TablesPage() {
-  const { data: tables, isLoading } = trpc.table.list.useQuery({ tenantId: TENANT_ID });
-  const { data: sections } = trpc.table.sections.useQuery({ tenantId: TENANT_ID });
+  const { data: tables, isLoading } = useTables();
 
-  const tablesBySection = sections?.map((section) => ({
-    section,
-    tables: tables?.filter((t) => t.section === section) ?? [],
-  }));
+  const sections = [...new Set(tables?.map((t) => t.section) ?? [])];
 
   return (
     <div className="p-6">
@@ -30,26 +24,29 @@ export default function TablesPage() {
         <div className="text-center py-12 text-gray-400">Loading tables...</div>
       ) : (
         <div className="space-y-6">
-          {tablesBySection?.map(({ section, tables }) => (
-            <div key={section}>
-              <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <Armchair className="w-5 h-5 text-amber-500" />
-                {section}
-              </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                {tables.map((table) => (
-                  <div
-                    key={table.id}
-                    className={`rounded-xl border-2 p-4 text-center transition-shadow hover:shadow-md ${statusColors[table.status]}`}
-                  >
-                    <p className="text-2xl font-bold">{table.number}</p>
-                    <p className="text-xs mt-1 capitalize">{table.status}</p>
-                    <p className="text-xs mt-0.5 opacity-70">{table.capacity} seats</p>
-                  </div>
-                ))}
+          {sections.map((section) => {
+            const sectionTables = tables?.filter((t) => t.section === section) ?? [];
+            return (
+              <div key={section}>
+                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <Armchair className="w-5 h-5 text-amber-500" />
+                  {section}
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                  {sectionTables.map((table) => (
+                    <div
+                      key={table.id}
+                      className={`rounded-xl border-2 p-4 text-center transition-shadow hover:shadow-md ${statusColors[table.status]}`}
+                    >
+                      <p className="text-2xl font-bold">{table.number}</p>
+                      <p className="text-xs mt-1 capitalize">{table.status}</p>
+                      <p className="text-xs mt-0.5 opacity-70">{table.capacity} seats</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {/* Summary */}
           <div className="bg-white rounded-xl border p-4 flex flex-wrap gap-6">

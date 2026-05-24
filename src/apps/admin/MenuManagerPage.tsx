@@ -1,15 +1,13 @@
 import { useState } from "react";
-import { trpc } from "@/providers/trpc";
+import { useMenuCategories, useMenuItems } from "@/hooks/useStaticQueries";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Leaf, WheatOff, Star, Search } from "lucide-react";
 
-const TENANT_ID = 1;
-
 export default function MenuManagerPage() {
   const [search, setSearch] = useState("");
-  const { data: categories } = trpc.menu.categories.useQuery({ tenantId: TENANT_ID });
-  const { data: menuItems, isLoading } = trpc.menu.items.useQuery({ tenantId: TENANT_ID });
+  const { data: categories } = useMenuCategories();
+  const { data: menuItems, isLoading } = useMenuItems();
 
   const filtered = menuItems?.filter((item) =>
     search === "" || item.name.toLowerCase().includes(search.toLowerCase())

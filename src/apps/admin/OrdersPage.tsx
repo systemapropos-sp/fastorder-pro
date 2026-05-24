@@ -1,25 +1,19 @@
 import { useState } from "react";
-import { trpc } from "@/providers/trpc";
+import { useOrders } from "@/hooks/useStaticQueries";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Search } from "lucide-react";
 
-const TENANT_ID = 1;
 const statusFilters = ["all", "pending", "confirmed", "preparing", "ready", "completed", "cancelled"];
 
 export default function OrdersPage() {
   const [status, setStatus] = useState("all");
   const [search, setSearch] = useState("");
 
-  const { data: orders, isLoading } = trpc.order.list.useQuery({
-    tenantId: TENANT_ID,
-    status: status === "all" ? undefined : status,
-  });
+  const { data: orders, isLoading } = useOrders(status === "all" ? undefined : status);
 
-  const utils = trpc.useUtils();
-  const updateStatus = trpc.order.updateStatus.useMutation({
-    onSuccess: () => { utils.order.list.invalidate(); utils.analytics.dashboard.invalidate(); },
-  });
+  // Mock mutation - no-op for demo
+  const updateStatus = { mutate: (_vars: any) => {}, isPending: false };
 
   const filtered = orders?.filter((o) =>
     search === "" ||

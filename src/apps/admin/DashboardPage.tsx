@@ -1,17 +1,15 @@
 import { useNavigate } from "react-router";
-import { trpc } from "@/providers/trpc";
+import { useDashboardStats, useTodayOrders, useSalesByDay } from "@/hooks/useStaticQueries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DollarSign, ShoppingCart, Users, TrendingUp, Clock, AlertTriangle } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
-const TENANT_ID = 1;
-
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const { data: stats, isLoading } = trpc.analytics.dashboard.useQuery({ tenantId: TENANT_ID });
-  const { data: salesByDay } = trpc.analytics.salesByDay.useQuery({ tenantId: TENANT_ID, days: 7 });
-  const { data: todayOrders } = trpc.order.todayOrders.useQuery({ tenantId: TENANT_ID });
+  const { data: stats, isLoading } = useDashboardStats();
+  const { data: salesByDay } = useSalesByDay(7);
+  const { data: todayOrders } = useTodayOrders();
 
   const statCards = [
     { label: "Today's Revenue", value: stats ? `$${stats.todayRevenue.toFixed(2)}` : "—", icon: DollarSign, color: "text-green-600", bg: "bg-green-50" },
@@ -29,7 +27,6 @@ export default function DashboardPage() {
         <p className="text-gray-500">Overview of your restaurant's performance</p>
       </div>
 
-      {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
         {statCards.map((card) => (
           <Card key={card.label} className={`cursor-pointer transition-shadow hover:shadow-md ${card.onClick ? "hover:border-amber-300" : ""}`} onClick={card.onClick}>
@@ -51,7 +48,6 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Sales Chart */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Revenue (Last 7 Days)</CardTitle>
@@ -72,7 +68,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Recent Orders */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg">Today's Orders</CardTitle>

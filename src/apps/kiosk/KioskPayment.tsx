@@ -1,40 +1,24 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useCartStore } from "@/store/cartStore";
-import { trpc } from "@/providers/trpc";
 import { CreditCard, Banknote, Smartphone, Loader2 } from "lucide-react";
 
 export default function KioskPayment() {
   const navigate = useNavigate();
-  const { items, getSubtotal, getTax, getTotal, orderType, clearCart } = useCartStore();
+  const { items, getSubtotal, getTax, getTotal, clearCart } = useCartStore();
   const [method, setMethod] = useState<"card" | "cash">("card");
   const [processing, setProcessing] = useState(false);
 
-  const createOrder = trpc.order.create.useMutation({
-    onSuccess: () => {
-      clearCart();
-      navigate("/kiosk/confirmation");
-    },
-  });
+  // Mock createOrder
+  const handleCreateOrder = () => {
+    clearCart();
+    navigate("/kiosk/confirmation");
+  };
 
   const handlePay = async () => {
     setProcessing(true);
-    await createOrder.mutateAsync({
-      tenantId: 1,
-      orderType,
-      source: "kiosk",
-      subtotal: getSubtotal().toFixed(2),
-      tax: getTax().toFixed(2),
-      total: getTotal().toFixed(2),
-      items: items.map((item) => ({
-        menuItemId: item.menuItemId,
-        name: item.name,
-        quantity: item.quantity,
-        unitPrice: item.price.toFixed(2),
-        totalPrice: ((item.price + item.selectedOptions.reduce((s, o) => s + o.priceModifier, 0)) * item.quantity).toFixed(2),
-        selectedOptions: item.selectedOptions,
-      })),
-    });
+    await new Promise((r) => setTimeout(r, 800));
+    handleCreateOrder();
     setProcessing(false);
   };
 

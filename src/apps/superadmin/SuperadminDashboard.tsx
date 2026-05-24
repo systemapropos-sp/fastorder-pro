@@ -1,16 +1,15 @@
-import { trpc } from "@/providers/trpc";
+import { useDashboardStats, useSalesByDay, usePopularItems, useOrders } from "@/hooks/useStaticQueries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, DollarSign, Users, TrendingUp, Globe, Zap } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
-const TENANT_ID = 1;
 const COLORS = ["#f59e0b", "#10b981", "#3b82f6", "#8b5cf6", "#ef4444"];
 
 export default function SuperadminDashboard() {
-  const { data: analytics } = trpc.analytics.dashboard.useQuery({ tenantId: TENANT_ID });
-  const { data: salesByDay } = trpc.analytics.salesByDay.useQuery({ tenantId: TENANT_ID, days: 7 });
-  const { data: popularItems } = trpc.analytics.popularItems.useQuery({ tenantId: TENANT_ID, limit: 5 });
-  const { data: orders } = trpc.order.list.useQuery({ tenantId: TENANT_ID });
+  const { data: analytics } = useDashboardStats();
+  const { data: salesByDay } = useSalesByDay(7);
+  const { data: popularItems } = usePopularItems(5);
+  const { data: orders } = useOrders();
 
   const statusData = [
     { name: "Active", value: orders?.filter((o) => ["pending", "confirmed", "preparing", "ready"].includes(o.status)).length ?? 0 },

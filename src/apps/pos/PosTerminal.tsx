@@ -1,27 +1,29 @@
 import { useState } from "react";
 
-import { trpc } from "@/providers/trpc";
+import { usePosMenuItems, useMenuCategories } from "@/hooks/useStaticQueries";
 import { useCartStore } from "@/store/cartStore";
 import { Search, Plus, Minus, Trash2, CreditCard, Banknote, CheckCircle } from "lucide-react";
 
-const TENANT_ID = 1;
-
 export default function PosTerminal() {
-  const { data: menuItems } = trpc.menu.items.useQuery({ tenantId: TENANT_ID });
+  const { data: menuItems } = usePosMenuItems();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
-  const { data: categories } = trpc.menu.categories.useQuery({ tenantId: TENANT_ID });
+  const { data: categories } = useMenuCategories();
 
   const { items, addItem, removeItem, updateQuantity, getSubtotal, getTax, getTotal, clearCart } = useCartStore();
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card">("cash");
   const [receipt, setReceipt] = useState<any>(null);
 
-  const createOrder = trpc.order.create.useMutation({
-    onSuccess: (data) => {
-      setReceipt({ orderNumber: data.orderNumber, total: getTotal() });
+  // Mock createOrder - generates receipt locally
+  const TENANT_ID = 1;
+  const createOrder = {
+    mutate: (_vars: any) => {
+      const orderNumber = `FO-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+      setReceipt({ orderNumber, total: getTotal() });
       clearCart();
     },
-  });
+    isPending: false,
+  };
 
   const filtered = menuItems?.filter((item) => {
     const matchesSearch = search === "" || item.name.toLowerCase().includes(search.toLowerCase());

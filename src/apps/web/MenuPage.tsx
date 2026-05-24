@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { trpc } from "@/providers/trpc";
+import { useMenuCategories, useMenuItems, usePopularMenuItems } from "@/hooks/useStaticQueries";
 import { useCartStore } from "@/store/cartStore";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -8,12 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Leaf, Flame, WheatOff, Plus, Minus, Star, Clock, ShoppingBag } from "lucide-react";
 
-const TENANT_ID = 1;
-
 export default function MenuPage() {
-  const { data: categories } = trpc.menu.categories.useQuery({ tenantId: TENANT_ID });
-  const { data: menuItems } = trpc.menu.items.useQuery({ tenantId: TENANT_ID });
-  const { data: popularItems } = trpc.menu.popularItems.useQuery({ tenantId: TENANT_ID });
+  const { data: categories } = useMenuCategories();
+  const { data: menuItems } = useMenuItems();
+  const { data: popularItems } = usePopularMenuItems();
 
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
   const [selectedItem, setSelectedItem] = useState<any>(null);

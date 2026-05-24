@@ -1,7 +1,5 @@
-import { trpc } from "@/providers/trpc";
+import { useStaff } from "@/hooks/useStaticQueries";
 import { Mail, Phone, Shield } from "lucide-react";
-
-const TENANT_ID = 1;
 
 const roleColors: Record<string, string> = {
   manager: "bg-purple-100 text-purple-700",
@@ -13,7 +11,7 @@ const roleColors: Record<string, string> = {
 };
 
 export default function StaffPage() {
-  const { data: staff, isLoading } = trpc.staff.list.useQuery({ tenantId: TENANT_ID });
+  const { data: staff, isLoading } = useStaff();
 
   return (
     <div className="p-6">

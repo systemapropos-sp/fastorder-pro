@@ -1,13 +1,11 @@
-import { trpc } from "@/providers/trpc";
+import { useMenuItems, useStaff, useTables } from "@/hooks/useStaticQueries";
 import { Building2, Phone, Mail, MapPin, BadgeCheck, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-const TENANT_ID = 1;
-
 export default function TenantManagement() {
-  const { data: menuItems } = trpc.menu.items.useQuery({ tenantId: TENANT_ID });
-  const { data: staff } = trpc.staff.list.useQuery({ tenantId: TENANT_ID });
-  const { data: tables } = trpc.table.list.useQuery({ tenantId: TENANT_ID });
+  const { data: menuItems } = useMenuItems();
+  const { data: staff } = useStaff();
+  const { data: tables } = useTables();
 
   // Hardcoded tenant info for display since we seeded it
   const tenant = {

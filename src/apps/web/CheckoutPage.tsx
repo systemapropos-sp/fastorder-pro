@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useCartStore } from "@/store/cartStore";
-import { trpc } from "@/providers/trpc";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { CreditCard, Smartphone, Banknote, CheckCircle, Loader2 } from "lucide-react";
@@ -17,13 +16,22 @@ export default function CheckoutPage() {
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
 
-  const createOrder = trpc.order.create.useMutation({
-    onSuccess: (data) => {
-      setOrderNumber(data.orderNumber);
+  // Mock createOrder
+  const createOrder = {
+    mutate: (_vars: any) => {
+      const on = `FO-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+      setOrderNumber(on);
       setOrderComplete(true);
       clearCart();
     },
-  });
+    mutateAsync: async (_vars: any) => {
+      const on = `FO-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+      setOrderNumber(on);
+      setOrderComplete(true);
+      clearCart();
+    },
+    isPending: false,
+  };
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
